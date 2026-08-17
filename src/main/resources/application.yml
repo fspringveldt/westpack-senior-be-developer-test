@@ -60,7 +60,7 @@ management:
       base-path: /api/v1/actuator
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: never
     metrics:
       enabled: true
   metrics:
