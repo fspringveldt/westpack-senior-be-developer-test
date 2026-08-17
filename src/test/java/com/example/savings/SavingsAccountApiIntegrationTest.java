@@ -101,4 +101,23 @@ class SavingsAccountApiIntegrationTest {
             () -> accountService.createAccount(new CreateAccountRequest("alan turing", null)))
         .isInstanceOf(AccountLimitExceededException.class);
   }
+
+  @Test
+  void allowsMultipleAccountsPerCustomerUpToTheLimit() {
+    // Customers should be able to create multiple accounts (up to 5)
+    IntStream.range(0, 5)
+        .forEach(
+            index ->
+                accountService.createAccount(
+                    new CreateAccountRequest("Ada Lovelace", "Account " + index)));
+
+    assertThat(accountRepository.countByCustomerNameIgnoreCase("ada lovelace")).isEqualTo(5);
+
+    // Only the 6th should be rejected
+    assertThatThrownBy(
+            () ->
+                accountService.createAccount(
+                    new CreateAccountRequest("Ada Lovelace", "Sixth account")))
+        .isInstanceOf(AccountLimitExceededException.class);
+  }
 }

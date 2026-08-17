@@ -86,6 +86,21 @@ Content-Type: application/json
 }
 ```
 
+**Browser console:**
+
+```javascript
+fetch('http://localhost:8080/api/v1/savings-accounts', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    customerName: "Ada Lovelace",
+    accountNickName: "Rainy day fund"
+  })
+})
+.then(r => r.json())
+.then(data => console.log(data))
+```
+
 Returns `201 Created` with the created account payload.
 
 ### Get account by ID
@@ -94,10 +109,26 @@ Returns `201 Created` with the created account payload.
 GET /api/v1/savings-accounts/{id}
 ```
 
+**Browser console:**
+
+```javascript
+fetch('http://localhost:8080/api/v1/savings-accounts/{id}')
+  .then(r => r.json())
+  .then(data => console.log(data))
+```
+
 ### Get account by account number
 
 ```http
 GET /api/v1/savings-accounts/by-account-number/{accountNumber}
+```
+
+**Browser console:**
+
+```javascript
+fetch('http://localhost:8080/api/v1/savings-accounts/by-account-number/{accountNumber}')
+  .then(r => r.json())
+  .then(data => console.log(data))
 ```
 
 ### Common response codes
