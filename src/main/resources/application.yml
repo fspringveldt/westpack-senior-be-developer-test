@@ -1,0 +1,78 @@
+spring:
+  application:
+    name: savings-account-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/savings}
+    username: ${DB_USERNAME:savings}
+    password: ${DB_PASSWORD:savings}
+    hikari:
+      # Fail fast instead of hanging the request thread when postgres is down.
+      connection-timeout: 3000
+      initialization-fail-timeout: -1
+      validation-timeout: 2000
+      maximum-pool-size: 10
+      minimum-idle: 2
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+      connect-timeout: 2s
+  cache:
+    type: redis
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    display-request-duration: true
+  api-docs:
+    path: /v3/api-docs
+
+savings:
+  account:
+    max-accounts-per-customer: 5
+    offensive-nicknames:
+      - badword
+      - offensive
+      - inappropriate
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /api/v1/actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: warn
+    org.hibernate.type.descriptor.sql.BasicBinder: warn
+    org.springframework.data.redis: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

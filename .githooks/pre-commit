@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Pre-commit hook to run Spotless formatting
+# Prevents committing code that doesn't meet the project's style guidelines
+
+export JAVA_HOME=${JAVA_HOME:-/opt/homebrew/Cellar/openjdk@21/21.0.12}
+
+echo "Running Spotless check..."
+if ! ./gradlew spotlessCheck --quiet 2>&1; then
+  echo ""
+  echo "⚠️  Code formatting issues detected. Running spotlessApply to fix..."
+  ./gradlew spotlessApply --quiet
+  echo "✓ Formatting applied. Please review changes and re-stage if needed."
+  echo ""
+  exit 1
+fi
+
+echo "✓ Code formatting OK"
+exit 0

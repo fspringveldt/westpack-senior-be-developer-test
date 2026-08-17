@@ -1,0 +1,16 @@
+#!/bin/bash
+# Pre-push hook: run Spotless formatting check
+# Prevents pushing unformatted code to the remote repository
+
+echo "Running Spotless formatting check before push..."
+export JAVA_HOME=/opt/homebrew/Cellar/openjdk@21/21.0.12
+./gradlew spotlessCheck --no-daemon
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ Formatting check failed. Fix with: ./gradlew spotlessApply"
+    exit 1
+fi
+
+echo "✅ Formatting check passed"
+exit 0
