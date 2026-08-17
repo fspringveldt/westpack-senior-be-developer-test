@@ -7,6 +7,8 @@ import com.example.savings.config.CacheConstants;
 import com.example.savings.domain.Account;
 import com.example.savings.domain.AccountRepository;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AccountService {
+
+  private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
   private final AccountRepository accountRepository;
   private final OffensiveNicknamePolicy offensiveNicknamePolicy;
@@ -54,6 +58,11 @@ public class AccountService {
     // customer-level account quotas under concurrent requests.
     long existingAccounts = accountRepository.countByCustomerNameIgnoreCase(request.customerName());
     if (existingAccounts >= policy.maxAccountsPerCustomer()) {
+      // Log limit enforcement without customer name to avoid PII in logs
+      log.warn(
+          "Account limit reached: {} accounts created (max={})",
+          existingAccounts,
+          policy.maxAccountsPerCustomer());
       throw new AccountLimitExceededException(
           request.customerName(), policy.maxAccountsPerCustomer());
     }
@@ -74,6 +83,7 @@ public class AccountService {
   @Transactional(readOnly = true)
   @Cacheable(cacheNames = CacheConstants.ACCOUNTS_BY_NUMBER, key = "#accountNumber")
   public AccountResponse getAccountByNumber(String accountNumber) {
+    log.debug("Fetching account by number: {}", accountNumber);
     return accountRepository
         .findByAccountNumber(accountNumber)
         .map(AccountResponse::from)
